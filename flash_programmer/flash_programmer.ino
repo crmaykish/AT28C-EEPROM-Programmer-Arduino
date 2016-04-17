@@ -4,7 +4,7 @@ const int CE = 4;
 const int OE = 2;
 const int WE = 3;
 const int DQ[] = {22, 23, 24, 25, 26, 27, 28, 29};
-const int A[] = {30, 31, 32, 33, 34, 35, 36, 37, 38};
+const int A[] = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48};
 
 void setup() {
   pinMode(OE, OUTPUT);
@@ -16,13 +16,16 @@ void setup() {
   digitalWrite(CE, HIGH);
 
   // Set address bus to outputs
-  for (int i = 0; i < 8; i++){
+  for (int i = 0; i < 19; i++){
     pinMode(A[i], OUTPUT);
   }
 
   Serial.begin(9600);
 
   delay(50);
+
+  storeValue(0, 0);
+  storeValue(15, 0);
 }
 
 void loop() {
@@ -52,7 +55,7 @@ void writeByte(int addr, int val){
   }
 
   // set address
-  for (int i = 0; i < 8; i++){
+  for (int i = 0; i < 19; i++){
     int a = (addr & (1 << i)) > 0;
     digitalWrite(A[i], a);
   }
@@ -79,7 +82,7 @@ void readByte(int addr){
   }
 
   // Write the addr
-  for (int i = 0; i < 8; i++){
+  for (int i = 0; i < 19; i++){
     int a = (addr & (1 << i)) > 0;
     digitalWrite(A[i], a);
   }
