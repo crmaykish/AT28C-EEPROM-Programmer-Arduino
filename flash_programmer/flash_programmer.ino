@@ -1,33 +1,23 @@
-// AT28C Flash Memory Programmer
+// AT28C EEPROM Programmer for Arduino Mega
 // Colin Maykish (cmaykish.com)
 // 04/17/2016
 
 // Width in bits of address bus (64K has 13, 256K has 15)
 const int ADDR_BUS_WIDTH = 13;
 
-// Pins
+// Chip Enable
 const int CE = 2;
+// Ouput Enable
 const int OE = 3;
+// Write Enable
 const int WE = 4;
+// Data bus pins
 const int I[] = { 22, 23, 24, 25, 26, 27, 28, 29 };
+// Address bus pins
 const int A[] = { 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 };
 
-// Set data bus to INPUT or OUTPUT
-void setDataBusMode(int mode) {
-	if (mode == INPUT || mode == OUTPUT) {
-		for (int i = 0; i < 8; i++) {
-			pinMode(I[i], mode);
-		}
-	}
-}
-
-// Write an address to the address bus
-void setAddress(int addr) {
-	for (int i = 0; i < ADDR_BUS_WIDTH; i++) {
-		int a = (addr & (1 << i)) > 0;
-		digitalWrite(A[i], a);
-	}
-}
+// Byte array to write to EEPROM
+const byte HEX_FILE[] = { 0x0, 0x0, 0x0, 0x0, 0x0 };
 
 void setup() {
 	Serial.begin(9600);
@@ -45,14 +35,33 @@ void setup() {
 		pinMode(A[i], OUTPUT);
 	}
 
-	writeByte(0, 15);
-	writeByte(1, 23);
+	// Write hex file to EEPROM
+	for (int i = 0; i < sizeof(HEX_FILE); i++) {
+		writeByte(i, HEX_FILE[i]);
+	}
 }
 
 void loop() {
 	while (Serial.available() > 0) {
 		int b = Serial.parseInt();
 		Serial.println(readByte(b));
+	}
+}
+
+// Set data bus to INPUT or OUTPUT
+void setDataBusMode(int mode) {
+	if (mode == INPUT || mode == OUTPUT) {
+		for (int i = 0; i < 8; i++) {
+			pinMode(I[i], mode);
+		}
+	}
+}
+
+// Write an address to the address bus
+void setAddress(int addr) {
+	for (int i = 0; i < ADDR_BUS_WIDTH; i++) {
+		int a = (addr & (1 << i)) > 0;
+		digitalWrite(A[i], a);
 	}
 }
 
