@@ -30,3 +30,10 @@
 
 # Debug files
 *.dSYM/
+
+
+.vs/
+__vm/
+*.vcxproj
+*.vcxproj.filters
+*.filters
