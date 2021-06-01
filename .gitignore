@@ -30,7 +30,7 @@
 
 # Debug files
 *.dSYM/
-
+Debug/
 
 .vs/
 __vm/

@@ -10,4 +10,3 @@ I made myself a shield to avoid breadboarding the massive amount of wires every 
 
 ![Arduino Mega shield](mega-shield.jpg)
 
-She may not look like much, but she's got it where it counts.
