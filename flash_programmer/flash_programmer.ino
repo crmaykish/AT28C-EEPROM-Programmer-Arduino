@@ -13,9 +13,6 @@ const int I[] = {46, 47, 48, 49, 50, 51, 52, 53};
 // Address pins
 const int A[] = {26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
 
-// Byte array to write to EEPROM
-const byte HEX_FILE[] = {0xDE, 0xAD, 0xBE, 0xEF};
-
 void setup()
 {
 	// Define control pins and turn them all off
@@ -32,12 +29,6 @@ void setup()
 		pinMode(A[i], OUTPUT);
 	}
 
-	// Write hex file to EEPROM
-	for (int i = 0; i < sizeof(HEX_FILE); i++)
-	{
-		writeByte(i, HEX_FILE[i]);
-	}
-
 	Serial.begin(115200);
 }
 
@@ -45,11 +36,27 @@ void loop()
 {
 	while (Serial.available() > 0)
 	{
-		uint16_t addr = Serial.parseInt();
-		Serial.print("Data at 0x");
-		Serial.print(addr, HEX);
-		Serial.print(" : 0x");
-		Serial.println(readByte(addr), HEX);
+    // Note: Reading and writing works, but only with decimal arguments
+  
+    String input = Serial.readStringUntil('\n');
+    String command = input.substring(0, 2);
+    uint16_t addr = (input.substring(2, 7).toInt() & 0xFFFF);
+
+    if (command.equals("RD"))
+    {
+      Serial.println(readByte(addr), HEX);
+    }
+
+    else if (command.equals("WR")){
+      byte data = (input.substring(7, 10).toInt() & 0xFF);
+//      Serial.println(data, HEX);
+      writeByte(addr, data);
+      Serial.println("DONE");
+    }
+    else
+    {
+      Serial.println("Bad input: " + input);
+    }
 	}
 }
 
