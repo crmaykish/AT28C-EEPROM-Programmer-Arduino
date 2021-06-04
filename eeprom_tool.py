@@ -44,7 +44,7 @@ def main():
 
             # Wait for response
             response = ser.readline().decode().strip()
-            print(hex(addr).zfill(4) + " : " + response)
+            print(hex(addr)[2:].zfill(4).upper() + " : " + response.zfill(2))
             addr += 1
 
     elif args.write:
