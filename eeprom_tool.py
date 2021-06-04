@@ -15,6 +15,7 @@ def main():
     parser.add_argument("-w", "--write", action="store_true")
     parser.add_argument("-e", "--erase", action="store_true")
     parser.add_argument("-f", "--file", action="store", type=str, nargs=1)
+    parser.add_argument("-l", "--limit", action="store", type=int, nargs=1)
 
     args = parser.parse_args()
 
@@ -33,23 +34,51 @@ def main():
 
     addr = 0
 
-    # Open binary file
-    with open(args.file[0], mode='rb') as file:
-        contents = file.read()
+    if args.read:
+        print("Reading EEPROM")
 
-        if args.write:
-            for b in contents:
-                command = "WR" + str(addr).zfill(5) + str(b).zfill(3) + '\n'
-                b = command.encode()
-                print("Writing: " + command)
-                ser.write(b)
-                addr += 1
+        for x in range(args.limit[0]):
+            command = "RD" + hex(addr)[2:].zfill(4).upper() + '\n'
+            b = command.encode()
+            ser.write(b)
 
-                # Wait for response
-                response = ser.readline().decode().strip()
+            # Wait for response
+            response = ser.readline().decode().strip()
+            print(hex(addr).zfill(4) + " : " + response)
+            addr += 1
 
-                if response != "DONE":
-                    print(response)
+    elif args.write:
+        print("Writing file " + args.file[0] + " to EEPROM")
+        # Open binary file
+        with open(args.file[0], mode='rb') as file:
+            contents = file.read()
+
+            print("Input file size: " + str(len(contents)))
+
+            print("Limiting to first " + str(args.limit[0]) + " bytes")
+
+            if args.write:
+                for b in contents:
+                    command = "WR" + \
+                        hex(addr)[2:].zfill(4).upper() + \
+                        hex(b)[2:].zfill(2).upper() + '\n'
+                    b = command.encode()
+                    ser.write(b)
+                    addr += 1
+
+                    # Wait for response
+                    response = ser.readline().decode().strip()
+
+                    if response != "DONE":
+                        print(response)
+                        ser.close()
+                        print("Closed " + ser.name)
+                        exit(1)
+                    else:
+                        print(str(addr) + " / " + str(len(contents)))
+
+                    if args.limit[0] is not None and addr >= args.limit[0]:
+                        break
 
     ser.close()
     print("Closed " + ser.name)

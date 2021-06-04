@@ -1,17 +1,46 @@
-// AT28C EEPROM Programmer for Arduino Mega
-// Colin Maykish (github.com/crmaykish)
-// 04/17/2016
+/*
+ AT28C EEPROM Programmer for Arduino Mega
+ Colin Maykish (github.com/crmaykish)
+ 
+ 04/17/2016 - original release
+ 06/03/2021 - expanded serial port interface
+
+ Serial interface supports two commands: read and write
+ 
+ Read: Reads a single byte at the 16-bit address.
+    Format: RDXXXX where XXXX is a hex number,
+      e.g. RD00FF reads the byte at address 0xFF
+      
+    Output: Write the byte in hex format to the serial port
+    
+ Write: Writes a byte to the given 16-bit address.
+    Format: WRXXXXYY where XXXX is a hex number and YY is a hex byte,
+    e.g. WRABCD10 writes 0x10 to 0xABCD
+    
+    Output: Write 'DONE' to the serial port if the write was successful
+
+ All commands must be terminated with a newline ('\n')
+
+ Write command requires address and data values be padded with leading 0s to their full length.
+ Read command does not require leading 0s
+*/
+
+#define DELAY_TIME    2   // I don't know why this delay is required, but without it, writes are missed frequently
 
 // Control pins
-#define CHIP_ENABLE 7
+#define CHIP_ENABLE   7
 #define OUTPUT_ENABLE 8
-#define WRITE_ENABLE 9
+#define WRITE_ENABLE  9
 
 // I/O pins
 const int I[] = {46, 47, 48, 49, 50, 51, 52, 53};
 
 // Address pins
 const int A[] = {26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
+
+// Input buffers
+char readAddr[5];
+char readData[3];
 
 void setup()
 {
@@ -36,20 +65,21 @@ void loop()
 {
 	while (Serial.available() > 0)
 	{
-    // Note: Reading and writing works, but only with decimal arguments
-  
     String input = Serial.readStringUntil('\n');
     String command = input.substring(0, 2);
-    uint16_t addr = (input.substring(2, 7).toInt() & 0xFFFF);
 
+    input.substring(2, 6).toCharArray(readAddr, 5);
+
+    uint16_t addr = (uint16_t)strtol(readAddr, NULL, 16);
+    
     if (command.equals("RD"))
     {
       Serial.println(readByte(addr), HEX);
     }
 
     else if (command.equals("WR")){
-      byte data = (input.substring(7, 10).toInt() & 0xFF);
-//      Serial.println(data, HEX);
+      input.substring(6, 8).toCharArray(readData, 3);
+      byte data = (byte)strtol(readData, NULL, 16);
       writeByte(addr, data);
       Serial.println("DONE");
     }
@@ -82,7 +112,7 @@ void setAddress(int addr)
 	}
 }
 
-void writeByte(int addr, byte val)
+void writeByte(uint16_t addr, byte val)
 {
 	digitalWrite(OUTPUT_ENABLE, HIGH);
 	setDataBusMode(OUTPUT);
@@ -97,16 +127,16 @@ void writeByte(int addr, byte val)
 
 	// Commit data write
 	digitalWrite(CHIP_ENABLE, LOW);
-	delay(10);
+	delay(DELAY_TIME);
 	digitalWrite(WRITE_ENABLE, LOW);
-	delay(10);
+	delay(DELAY_TIME);
 	digitalWrite(WRITE_ENABLE, HIGH);
-	delay(10);
+	delay(DELAY_TIME);
 	digitalWrite(CHIP_ENABLE, HIGH);
-	delay(10);
+	delay(DELAY_TIME);
 }
 
-byte readByte(int addr)
+byte readByte(uint16_t addr)
 {
 	byte data = 0;
 
@@ -121,7 +151,7 @@ byte readByte(int addr)
 
 	digitalWrite(CHIP_ENABLE, LOW);
 	digitalWrite(OUTPUT_ENABLE, LOW);
-	delay(10);
+	delay(DELAY_TIME);
 
 	// Read data bus
 	for (int i = 0; i < 8; i++)
@@ -132,7 +162,7 @@ byte readByte(int addr)
 
 	digitalWrite(OUTPUT_ENABLE, HIGH);
 	digitalWrite(CHIP_ENABLE, HIGH);
-	delay(10);
+	delay(DELAY_TIME);
 
 	return data;
 }
