@@ -13,7 +13,6 @@ def main():
     parser.add_argument("-d", "--device", action="store", type=str, nargs=1)
     parser.add_argument("-r", "--read", action="store_true")
     parser.add_argument("-w", "--write", action="store_true")
-    parser.add_argument("-e", "--erase", action="store_true")
     parser.add_argument("-f", "--file", action="store", type=str, nargs=1)
     parser.add_argument("-l", "--limit", action="store", type=int, nargs=1)
 
