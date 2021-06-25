@@ -15,6 +15,7 @@ def main():
     parser.add_argument("-w", "--write", action="store_true")
     parser.add_argument("-f", "--file", action="store", type=str, nargs=1)
     parser.add_argument("-l", "--limit", action="store", type=int, nargs=1)
+    parser.add_argument("-o", "--offset", action="store", type=int, nargs=1)
 
     args = parser.parse_args()
 
@@ -33,6 +34,9 @@ def main():
 
     addr = 0
 
+    if (args.offset):
+            addr = args.offset[0]
+
     if args.read:
         print("Reading EEPROM")
 
@@ -48,6 +52,7 @@ def main():
 
     elif args.write:
         print("Writing file " + args.file[0] + " to EEPROM")
+
         # Open binary file
         with open(args.file[0], mode='rb') as file:
             contents = file.read()
@@ -74,9 +79,9 @@ def main():
                         print("Closed " + ser.name)
                         exit(1)
                     else:
-                        print(str(addr) + " / " + str(len(contents)))
+                        print(str(addr - args.offset[0]) + " / " + str(len(contents)))
 
-                    if args.limit[0] is not None and addr >= args.limit[0]:
+                    if args.limit[0] is not None and addr >= args.limit[0] + args.offset[0]:
                         break
 
     ser.close()
