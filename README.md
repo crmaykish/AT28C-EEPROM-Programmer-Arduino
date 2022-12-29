@@ -29,4 +29,5 @@ Flash a binary file to the EEPROM:
 
 ![Breadboard Diagram](at28c_programmer_bb.png)
 
+See the [circuit pinout table](circuit_table.csv) as well.
 
