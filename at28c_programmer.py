@@ -37,6 +37,8 @@ def main():
 
     if (args.offset):
         addr = args.offset[0]
+    else:
+        args.offset = [0]  # Set offset to zero
 
     if args.read:
         print("Reading EEPROM")
@@ -59,8 +61,9 @@ def main():
             contents = file.read()
 
             print("Input file size: " + str(len(contents)))
-
-            print("Limiting to first " + str(args.limit[0]) + " bytes")
+            print(args)
+            if args.limit:
+                print("Limiting to first " + str(args.limit[0]) + " bytes")
 
             if args.write:
                 for b in contents:
@@ -83,7 +86,7 @@ def main():
                         print(
                             str(addr - args.offset[0]) + " / " + str(len(contents)))
 
-                    if args.limit[0] is not None and addr >= args.limit[0] + args.offset[0]:
+                    if args.limit and args.limit[0] is not None and addr >= args.limit[0] + args.offset[0]:
                         break
 
     elif args.clear:
