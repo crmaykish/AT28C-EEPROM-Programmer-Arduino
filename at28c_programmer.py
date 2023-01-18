@@ -17,9 +17,14 @@ def main():
     parser.add_argument("-l", "--limit", action="store", type=int, nargs=1)
     parser.add_argument("-o", "--offset", action="store", type=int, nargs=1)
     parser.add_argument("-c", "--clear", action="store_true")
+    parser.add_argument("--disable-sdp", dest='disableSdp', action="store_true", help="disable software data protection")
+    parser.add_argument("--enable-sdp", dest='enableSdp', action="store_true", help="enable software data protection")
+    parser.set_defaults(disableSdp=False)
+    parser.set_defaults(enableSdp=False)
+
 
     args = parser.parse_args()
-
+  
     # Open serial port
     ser = serial.Serial(args.device[0], 115200)
 
@@ -37,6 +42,37 @@ def main():
 
     if (args.offset):
         addr = args.offset[0]
+
+    if (args.disableSdp):
+        print("disabling software data protection")
+        command = "DS" + "0000" + "\n"
+        b = command.encode()
+        ser.write(b)
+
+        response = ser.readline().decode().strip()
+        if response != "DONE":
+            print(response)
+            ser.close()
+            print("Closed " + ser.name)
+            exit(1)
+        else:
+            print("done")
+
+
+    if (args.enableSdp):
+        print("enabling software data protection")
+        command = "ES" + "0000" + "\n"
+        b = command.encode()
+        ser.write(b)
+        response = ser.readline().decode().strip()
+        if response != "DONE":
+            print(response)
+            ser.close()
+            print("Closed " + ser.name)
+            exit(1)
+        else:
+            print("done")
+
 
     if args.read:
         print("Reading EEPROM")
