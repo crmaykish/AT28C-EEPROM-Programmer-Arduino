@@ -33,18 +33,11 @@
 #define OUTPUT_ENABLE 8
 #define WRITE_ENABLE  9
 
-
-#define CHIP_ENABLE   10
-#define OUTPUT_ENABLE 9
-#define WRITE_ENABLE  8
-
 // I/O pins
-// const int I[] = {46, 47, 48, 49, 50, 51, 52, 53};
-const int I[] = {31, 33, 35, 37, 39, 41, 43, 45};
+const int I[] = {46, 47, 48, 49, 50, 51, 52, 53};
 
 // Address pins
-//const int A[] = {26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
-const int A[] = {22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50};
+const int A[] = {26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
 
 // Input buffers
 char readAddr[5];
