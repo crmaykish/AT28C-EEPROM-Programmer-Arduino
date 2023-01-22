@@ -19,6 +19,12 @@ Read the first 20 bytes of the EEPROM:
 Flash a binary file to the EEPROM:
 `python3 at28c_programmer.py -d /dev/ttyACM0 -w -f file.bin`
 
+Disable Software data protection (AT28C64B only):
+`python3 at28c_programmer.py -d /dev/ttyUSB0 --disable-sdp`
+
+Enable Software data protection (AT28C64B only):
+`python3 at28c_programmer.py -d /dev/ttyUSB0 --enable-sdp`
+
 ## Notes
 
 1. I soldered this whole mess onto a PCB shield for the Arduino Mega with a ZIF socket to avoid having to wire this constantly.

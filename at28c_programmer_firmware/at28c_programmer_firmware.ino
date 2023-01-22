@@ -25,6 +25,7 @@
  Read command does not require leading 0s
 */
 
+
 #define DELAY_TIME    2   // I don't know why this delay is required, but without it, writes are missed frequently
 
 // Control pins
@@ -75,6 +76,16 @@ void loop()
     if (command.equals("RD"))
     {
       Serial.println(readByte(addr), HEX);
+    }
+
+    else if (command.equals("DS")) {
+      disableSoftwareDataProtection();
+      Serial.println("DONE");
+    }
+
+	else if (command.equals("ES")) {
+      enableSoftwareDataProtection();
+      Serial.println("DONE");
     }
 
     else if (command.equals("WR")){
@@ -165,4 +176,53 @@ byte readByte(uint16_t addr)
 	delay(DELAY_TIME);
 
 	return data;
+}
+
+void disableSoftwareDataProtection() {
+  digitalWrite(WRITE_ENABLE, HIGH); // disable write
+  setDataBusMode(OUTPUT);
+
+  setByte(0xaa, 0x1555);
+  setByte(0x55, 0x0aaa);
+  setByte(0x80, 0x1555);
+  setByte(0xaa, 0x1555);
+  setByte(0x55, 0x0aaa);
+  setByte(0x20, 0x1555);
+
+  setDataBusMode(INPUT);
+  delay(10);
+}
+
+
+void enableSoftwareDataProtection() {
+  digitalWrite(WRITE_ENABLE, HIGH); // disable write
+  setDataBusMode(OUTPUT);
+
+  setByte(0xaa, 0x1555);
+  setByte(0x55, 0x0aaa);
+  setByte(0xa0, 0x1555);
+  
+  setDataBusMode(INPUT);
+  delay(10);
+}
+
+
+
+void setByte(byte val, uint16_t addr) {
+  setAddress(addr);
+
+  // Send data value to data bus
+  for (int i = 0; i < 8; i++) {
+    int a = (val & (1 << i)) > 0;
+    digitalWrite(I[i], a);
+  }
+
+  // Commit data write
+  delayMicroseconds(1);
+  digitalWrite(WRITE_ENABLE, LOW);
+  digitalWrite(CHIP_ENABLE, LOW);
+  digitalWrite(WRITE_ENABLE, HIGH); 
+  digitalWrite(CHIP_ENABLE, HIGH);
+
+
 }
