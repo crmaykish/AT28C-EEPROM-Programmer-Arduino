@@ -1,3 +1,5 @@
+## Note: this project is archived and will not be maintained. Feel free to use it as a reference or create a fork.
+
 # AT28C EEPROM Programmer for Arduino Mega
 
 This is a simple way to program Atmel AT28C-style EEPROMs with an Arduino Mega.
